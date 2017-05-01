@@ -11,7 +11,7 @@ import ReactDOM as RDOM
 import React as R
 import Thermite as T
 
-import Components.Actions (spec, initialState)
+import Components.Lessons (spec, initialState)
 
 main :: Unit
 main = unsafePerformEff $ do
