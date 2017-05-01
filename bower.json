@@ -1,0 +1,20 @@
+{
+  "name": "purescript-thermite-example",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-prelude": "^3.0.0",
+    "purescript-console": "^3.0.0",
+    "purescript-eff": "^3.1.0",
+    "purescript-react": "^3.0.0",
+    "purescript-react-dom": "^3.0.0",
+    "purescript-thermite": "^4.1.0"
+  },
+  "devDependencies": {
+    "purescript-psci-support": "^3.0.0"
+  }
+}

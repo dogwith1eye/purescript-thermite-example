@@ -1,0 +1,14 @@
+/bower_components/
+/node_modules/
+/.pulp-cache/
+/output/
+/generated-docs/
+/.psc*
+/.purs*
+/.psa*
+/.DS_Store
+/.psc-ide-port
+/npm-debug.log
+/tmp/
+/bundle.js
+/bundle.js.map
