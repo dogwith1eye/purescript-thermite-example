@@ -1,8 +1,14 @@
 module Components.Shared
   ( SharedState
   , initialState
-  , SharedActions(..)
+  , SharedAction(..)
+  , LessonsAction(..)
+  , Lesson2Action(..)
   ) where
+
+import Prelude (class Eq)
+
+--import Data.Either
 
 type SharedState =
   { lessonNumber :: Int
@@ -16,12 +22,20 @@ initialState =
   , lesson2: 0
   }
 
-data SharedActions
+data LessonsAction
   = First
   | Back
   | Next
   | Last
-  | Increment
-  | Decrement
 
-derive instance eqSharedActions :: Eq SharedActions
+derive instance eqLessonsAction :: Eq LessonsAction
+
+data Lesson2Action = Increment | Decrement
+
+derive instance eqLesson2Action :: Eq Lesson2Action
+
+data SharedAction 
+  = LessonsAction 
+  | Lesson2Action
+
+derive instance eqSharedAction :: Eq SharedAction
