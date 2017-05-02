@@ -1,28 +1,35 @@
 module Components.Lessons where
 
 import Prelude
+
 import React as R
 import React.DOM as RD
 import React.DOM.Props as RP
 import Thermite as T
-import Data.Lens (Lens, over, set, lens)
+import Data.Either (Either(..))
+import Data.Foldable (fold)
+import Data.Lens (Lens, Prism', prism, over, set, lens)
+
+import Components.Shared (SharedActions, SharedState) as SH
+import Components.Lesson1(lesson1)
 
 -- State
 
 type LessonsState =
   { lessonNumber   :: Int
+  , sharedState   :: SharedState
   }
 
 lessonNumber :: forall a b r. Lens { lessonNumber :: a | r } { lessonNumber :: b | r } a b
 lessonNumber = lens _.lessonNumber (_ { lessonNumber = _ })
 
--- Actions
-
-data LessonsAction
-  = First
-  | Back
-  | Next
-  | Last
+lessonNumberIs :: Int -> Prism' LessonsState SharedState
+lessonNumberIs n =
+  prism { lessonNumber: n, sharedState: _ }
+    case _ of
+      o@{ lessonNumber: m, sharedState: shared }
+        | m == n -> Right shared
+        | otherwise -> Left o
 
 numberOfLessons :: Int
 numberOfLessons = 2
@@ -41,9 +48,13 @@ last = set lessonNumber (numberOfLessons - 1)
 
 initialState :: LessonsState
 initialState =
-  { lessonNumber : 0 }
+  { lessonNumber : 0
+  , sharedState:
+    { lesson1: 0
+    }
+  }
 
-render :: forall props. T.Render LessonsState props LessonsAction
+render :: forall props. T.Render LessonsState props SharedActions
 render dispatch _ _ _ =
   [ RD.ul [ RP.className "pager" ] 
           [ RD.li' [ RD.a [ RP.href "#"
@@ -69,12 +80,22 @@ render dispatch _ _ _ =
           ]
   ]
 
-performAction :: forall props eff. T.PerformAction eff LessonsState props LessonsAction
+performAction :: forall props eff. T.PerformAction eff LessonsState props SharedActions
 performAction First _ _ = void $ T.modifyState first
 performAction Back  _ _ = void $ T.modifyState back
 performAction Next  _ _ = void $ T.modifyState next
 performAction Last  _ _ = void $ T.modifyState last
 performAction _ _ _ = pure unit
 
-spec :: forall props eff. T.Spec eff LessonsState props LessonsAction
-spec = T.simpleSpec performAction render
+navbar :: forall props eff. T.Spec eff LessonsState props SharedActions
+navbar = T.simpleSpec performAction render
+
+lessonsComponent :: forall props eff. T.Spec eff LessonsState props SharedActions
+lessonsComponent = fold
+    [ lesson 0  lesson1
+    ]
+  where
+    lesson n = T.split (lessonNumberIs n)
+
+mainComponent :: forall props eff. T.Spec eff LessonsState props SharedActions
+mainComponent = navbar <> lessonsComponent

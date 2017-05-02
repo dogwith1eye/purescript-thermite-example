@@ -1,26 +1,16 @@
-module Components.Actions where
+module Components.Lesson2(lesson2) where
 
 import Prelude
-
 import React as R
 import React.DOM as R
 import React.DOM.Props as RP
 import Thermite as T
+import Components.Shared (SharedActions(..), SharedState) as SH
+import Data.Lens (Prism', Lens, lens, only)
 
 type State = Int
 
--- Here is the action type associated with our component:
-
 data Action = Increment | Decrement
-
-initialState :: State
-initialState = 43
-
--- The first argument to the render function is a callback which
--- can be used to invoke actions.
---
--- Notice how the action gets attached to event handlers such as 
--- onClick.
 
 render :: T.Render State _ _
 render dispatch _ state _ =
@@ -46,15 +36,6 @@ render dispatch _ state _ =
           , R.text "."
           ]
   ]
-  
--- The performAction function is responsible for responding to an action
--- by returning a coroutine which emits state updates.
---
--- A simple coroutine emits a single state update using the 'cotransform'
--- function.
---
--- The coroutine type can also be used asynchronously, as we will see in
--- the next lesson.
 
 performAction :: T.PerformAction _ State _ Action
 performAction Increment _ _ = void $ T.modifyState $ \state -> state + 1
@@ -62,3 +43,15 @@ performAction Decrement _ _ = void $ T.modifyState $ \state -> state - 1
 
 spec :: T.Spec _ State _ Action
 spec = T.simpleSpec performAction render
+
+-- Adabpt component to work with shared state and actions
+
+lesson2State :: forall a b r. Lens { lesson2 :: a | r } { lesson2 :: b | r } a b
+lesson2State = lens _.lesson2 (_ { lesson2 = _ })
+
+lesson2Actions :: Prism' SH.SharedActions Unit
+lesson2Actions = only SH.Increment
+
+lesson2 :: forall eff props. T.Spec eff SH.SharedState props SH.SharedActions
+lesson2 = T.focus lesson2State lesson2Actions  spec
+

@@ -11,11 +11,11 @@ import ReactDOM as RDOM
 import React as R
 import Thermite as T
 
-import Components.Lessons (spec, initialState)
+import Components.Lessons (mainComponent, initialState)
 
 main :: Unit
 main = unsafePerformEff $ do
-  let component = T.createClass spec initialState
+  let component = T.createClass mainComponent initialState
   let appEl = R.createFactory component {}
 
   if isServerSide
