@@ -11,7 +11,7 @@ import ReactDOM as RDOM
 import React as R
 import Thermite as T
 
-import Lesson1.Counter (counter, initialState)
+import Lesson2.Counter (counter, initialState)
 
 main :: Unit
 main = unsafePerformEff $ do

@@ -1,4 +1,4 @@
-module Lesson1.Counter
+module Lesson2.Counter
   ( counter
   , initialState
   , CounterAction(..)
@@ -7,14 +7,33 @@ module Lesson1.Counter
 import Prelude
 import React.DOM as RD
 import Thermite as T
-import Data.Lens (Prism', prism')
+import Data.Lens (Prism', prism', Lens, lens, addOver, subOver, _1, _2)
 import Data.Maybe (Maybe(..))
-import Lesson1.Button (ButtonAction(..), button)
+import Data.Tuple (Tuple(..))
+import Lesson2.Button (ButtonAction(..), ButtonState, button)
 
-type CounterState = Int
+type CounterState =
+  { count :: Int
+  , buttonState :: Tuple ButtonState ButtonState
+  }
+
+count :: forall a b r. Lens { count :: a | r } { count :: b | r } a b
+count = lens _.count (_ { count = _ })
+
+buttonState :: forall a b r. Lens { buttonState :: a | r } { buttonState :: b | r } a b
+buttonState = lens _.buttonState (_ { buttonState = _ })
 
 initialState :: CounterState
-initialState = 0
+initialState =
+  { count : 0
+  , buttonState: Tuple
+    { text: "Increment"
+    , className: "btn btn-success"
+    }
+    { text: "Decrement"
+    , className: "btn btn-danger"
+    }
+  }
 
 data CounterAction
   = Increment
@@ -22,15 +41,15 @@ data CounterAction
 
 render :: T.Render CounterState _ _
 render _ _ state _ =
-  [ RD.h1' [ RD.text "Lesson 1 - Composition" ]
+  [ RD.h1' [ RD.text "Lesson 2 - Separating State" ]
   , RD.p'  [ RD.text "The state is: "
-           , RD.text (show state)
+           , RD.text (show state.count)
            ]
   ]
 
 performAction :: T.PerformAction _ CounterState _ CounterAction
-performAction Increment _ _ = void $ T.modifyState $ \state -> state + 1
-performAction Decrement _ _ = void $ T.modifyState $ \state -> state - 1
+performAction Increment _ _ = void $ T.modifyState $ addOver count 1
+performAction Decrement _ _ = void $ T.modifyState $ subOver count 1
 
 display :: T.Spec _ CounterState _ CounterAction
 display = T.simpleSpec performAction render
@@ -43,7 +62,7 @@ _Increment = prism' (const Increment) $
     _         -> Nothing
 
 incrementButton :: T.Spec _ CounterState _ CounterAction
-incrementButton = T.focus id _Increment button
+incrementButton = T.focus (buttonState <<< _1) _Increment button
 
 -- map a Clicked to an Decrement
 _Decrement :: Prism' CounterAction ButtonAction
@@ -53,7 +72,7 @@ _Decrement = prism' (const Decrement) $
     _         -> Nothing
 
 decrementButton :: T.Spec _ CounterState _ CounterAction
-decrementButton = T.focus id _Decrement button
+decrementButton = T.focus (buttonState <<< _2) _Decrement button
 
 counter :: T.Spec _ CounterState _ CounterAction
 counter = display <> incrementButton <> decrementButton
