@@ -11,11 +11,11 @@ import ReactDOM as RDOM
 import React as R
 import Thermite as T
 
-import Components.Lessons (mainComponent, initialState)
+import Lesson1.Counter (counter, initialState)
 
 main :: Unit
 main = unsafePerformEff $ do
-  let component = T.createClass mainComponent initialState
+  let component = T.createClass counter initialState
   let appEl = R.createFactory component {}
 
   if isServerSide
